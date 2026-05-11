@@ -40,8 +40,8 @@ public class PreparationEvent extends Event {
     @Override
     public void process(Model m, ISchedule s) {
         int doneTime = m.prepare(getTime(), order);
-        order.stepCompleted(); // step 3: queuing (phase 6) or cooking (phase 3-5)
-        // Phase 3-5: schedule cooking directly (no oven queue)
-        s.schedule(new CookingEvent(doneTime, order));
+        order.stepCompleted(); // step 3: queuing
+        // Phase 6: schedule queuing event (pizza must wait for the oven)
+        s.schedule(new QueuingEvent(doneTime, order));
     }
 }

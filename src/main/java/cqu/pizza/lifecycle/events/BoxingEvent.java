@@ -38,8 +38,20 @@ public class BoxingEvent extends Event {
      */
     @Override
     public void process(Model m, ISchedule s) {
+        // Phase 6: remove the cooked order from the oven queue
+        m.remove(getTime());
+
+        // Box the order
         int doneTime = m.box(getTime(), order);
-        order.stepCompleted(); // step 5: finalisation
+        order.stepCompleted(); // step 5: boxing done, next is finalisation
+
+        // If another order is waiting at the front of the queue, start cooking it now
+        Order next = m.peek();
+        if (next != null) {
+            s.schedule(new CookingEvent(getTime(), next));
+        }
+
+        // Schedule finalisation for this order
         s.schedule(new FinalisationEvent(doneTime, order));
     }
 }

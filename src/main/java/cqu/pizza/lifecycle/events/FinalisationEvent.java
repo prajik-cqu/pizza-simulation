@@ -40,6 +40,7 @@ public class FinalisationEvent extends Event {
     @Override
     public void process(Model m, ISchedule s) {
         m.finalise(getTime(), order);
-        order.stepCompleted(); // step 6: finished
+        // No stepCompleted() here: finalise() completes the order.
+        // In phase 3-5 the step is 5 (finished) after boxing increments to 5.
     }
 }

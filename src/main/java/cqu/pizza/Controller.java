@@ -1,5 +1,12 @@
 package cqu.pizza;
 
+import cqu.pizza.lifecycle.Model;
+import cqu.pizza.lifecycle.Report;
+import cqu.pizza.lifecycle.ReportException;
+import cqu.pizza.lifecycle.events.OrderEvent;
+import cqu.pizza.lifecycle.events.ReportEvent;
+import cqu.pizza.simulator.Simulator;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -29,6 +36,9 @@ public class Controller implements Initializable {
     @FXML
     private TextArea reportArea;
 
+    /** The report generated after the simulation runs. Null if no simulation has been run. */
+    private Report report;
+
     /**
      * Initializes the controller after the FXML has been loaded.
      *
@@ -37,18 +47,47 @@ public class Controller implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // nothing to initialise in phase 1
+        report = null;
     }
 
     /**
      * Handles the Run button click.
-     * In phase 1 this displays a stub message.
+     * Validates the duration input, runs the simulation, and displays the report.
      *
      * @param event the action event
      */
     @FXML
     private void handleRun(ActionEvent event) {
-        reportArea.setText("Run button handler invoked.");
+        report = null;
+        int duration;
+
+        // Validate duration input
+        try {
+            duration = Integer.parseInt(durationField.getText().trim());
+        } catch (NumberFormatException e) {
+            reportArea.setText("Error: Duration must be a positive integer.");
+            return;
+        }
+
+        if (duration <= 0) {
+            reportArea.setText("Error: Duration must be a positive integer.");
+            return;
+        }
+
+        // Run the simulation
+        Model model = new Model();
+        Simulator simulator = new Simulator(model);
+        simulator.initialize(
+                new OrderEvent(model.nextRequest()),
+                new ReportEvent(duration)
+        );
+        simulator.run(duration);
+
+        // Retrieve and display the report
+        report = model.getReport();
+        if (report != null) {
+            reportArea.setText(report.getText());
+        }
     }
 
     /**
@@ -62,17 +101,35 @@ public class Controller implements Initializable {
         durationField.clear();
         fileNameField.clear();
         reportArea.clear();
+        report = null;
     }
 
     /**
      * Handles the Save button click.
-     * In phase 1 this displays a stub message.
+     * Validates that a report exists and a file name has been entered,
+     * then saves the report to the specified file.
      *
      * @param event the action event
      */
     @FXML
     private void handleSave(ActionEvent event) {
-        reportArea.setText("Save button handler invoked.");
+        if (report == null) {
+            reportArea.setText("Error: No report to save. Please run the simulation first.");
+            return;
+        }
+
+        String fileName = fileNameField.getText().trim();
+        if (fileName.isEmpty()) {
+            reportArea.setText("Error: Please enter a file name.");
+            return;
+        }
+
+        try {
+            report.save(fileName);
+            reportArea.setText("Report saved to " + fileName);
+        } catch (ReportException e) {
+            reportArea.setText("Error: " + e.getMessage());
+        }
     }
 
     /**

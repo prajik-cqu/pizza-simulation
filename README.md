@@ -8,8 +8,8 @@ Developed as part of COIT20256 Assessment 3 at CQUniversity.
 
 ## Requirements
 
-- **Java 21** (JDK 21)
-- **JavaFX 21**
+- **Java 17** (JDK 17)
+- **JavaFX 17**
 - **Apache NetBeans** (recommended IDE)
 - **Maven** (bundled with NetBeans)
 

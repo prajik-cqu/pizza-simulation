@@ -4,6 +4,9 @@ import java.util.HashMap;
 
 public class Plan {
 
+    public static final int COOKING_TIME = 5;
+    public static final int BOXING_TIME = 1;
+
     private HashMap<String, Pizza> menu;
 
     static Pizza[] pizzas = {

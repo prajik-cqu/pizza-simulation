@@ -54,4 +54,30 @@ public class Model {
         activeOrders.add(o);
         return o;
     }
+
+    public int prepare(int time, Order order) {
+        int prepTime = plan.getPreparationTime(order.getPizza());
+        System.out.printf("t = %d: Order %d preparation will take %d minutes%n",
+                time, order.getId(), prepTime);
+        return time + prepTime;
+    }
+
+    public int cook(int time, Order order) {
+        System.out.printf("t = %d: Order %d cooking will take %d minutes%n",
+                time, order.getId(), Plan.COOKING_TIME);
+        return time + Plan.COOKING_TIME;
+    }
+
+    public int box(int time, Order order) {
+        System.out.printf("t = %d: Order %d boxing will take %d minute%n",
+                time, order.getId(), Plan.BOXING_TIME);
+        return time + Plan.BOXING_TIME;
+    }
+
+    public void finalise(int time, Order order) {
+        order.setFinish(time);
+        activeOrders.remove(order);
+        completedOrders.add(order);
+        System.out.printf("t = %d: Order %d completed%n", time, order.getId());
+    }
 }
